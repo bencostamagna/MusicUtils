@@ -44,6 +44,10 @@ def solve_mismatch(folder, mismatch_list):
             recheck = True
         elif var == "2":
             print("Retagging")
+            for f in m.files:
+                audiofile = eyed3.load(f)
+                audiofile.tag.artist = m.expected
+                audiofile.tag.save()
         else:
             pass
     return recheck
@@ -68,7 +72,10 @@ def process_folder(folder):
                                 m.add_file(f)
                                 found=True
                         if not found:
-                            mismatch_list.append(TagMismatch(tag=tags.tag.artist, expected=os.path.basename(folder)))
+                            mm = TagMismatch(tag=tags.tag.artist, expected=os.path.basename(folder))
+                            mm.add_file(f)
+                            mismatch_list.append(mm)
+
             except:
                 error_state.append(f)
 
