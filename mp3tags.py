@@ -7,8 +7,9 @@
 # Distributed under terms of the GPL3 license.
 
 import sys, os, os.path
+import traceback
 import magic
-import mutagen.easyid3
+import mutagen
 
 class TagMismatch:
     def __init__(self, tag, expected):
@@ -19,13 +20,15 @@ class TagMismatch:
     def add_file(self, filepath):
         self.files.append(filepath)
 
-def is_audio_file(f):
+def get_file_type(f):
     magic_string = magic.from_file(f)
     if 'MPEG' in magic_string:
-        return True
+        return "MPEG"
     if 'FLAC' in magic_string:
-        return True
-    return False
+        return "FLAC"
+    return None
+
+
 
 def scan_files(folder, flist):
     for f in os.listdir(folder):
@@ -51,7 +54,7 @@ def solve_mismatch(folder, mismatch_list):
         elif var == "2":
             print("Retagging")
             for f in m.files:
-                audiofile = mutagen.easyid3.EasyID3(f)
+                audiofile = mutagen.File(f)
                 audiofile["artist"] = m.expected
                 audiofile.save()
         else:
@@ -68,9 +71,10 @@ def process_folder(folder):
         mismatch_list = []
         for f in flist:
             try:
-                if is_audio_file(f):
-                    tags = mutagen.easyid3.EasyID3(f)
-                    artist =tags["artist"][0] 
+                ftype = get_file_type(f)
+                if ftype is not None:
+                    tags = mutagen.File(f, easy=True)
+                    artist = tags["artist"][0] 
                     if artist != os.path.basename(folder):
                         found=False
                         for m in mismatch_list:
@@ -83,7 +87,8 @@ def process_folder(folder):
                             mismatch_list.append(mm)
 
             except Exception as e:
-                print(e)
+                # print(e)
+                print(traceback.format_exc())
                 error_state.append(f)
 
         if len(mismatch_list) > 0:
