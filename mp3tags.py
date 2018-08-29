@@ -8,7 +8,7 @@
 
 import sys, os, os.path
 import magic
-import eyed3
+import mutagen.easyid3
 
 class TagMismatch:
     def __init__(self, tag, expected):
@@ -19,7 +19,13 @@ class TagMismatch:
     def add_file(self, filepath):
         self.files.append(filepath)
 
-
+def is_audio_file(f):
+    magic_string = magic.from_file(f)
+    if 'MPEG' in magic_string:
+        return True
+    if 'FLAC' in magic_string:
+        return True
+    return False
 
 def scan_files(folder, flist):
     for f in os.listdir(folder):
@@ -45,9 +51,9 @@ def solve_mismatch(folder, mismatch_list):
         elif var == "2":
             print("Retagging")
             for f in m.files:
-                audiofile = eyed3.load(f)
-                audiofile.tag.artist = m.expected
-                audiofile.tag.save()
+                audiofile = mutagen.easyid3.EasyID3(f)
+                audiofile["artist"] = m.expected
+                audiofile.save()
         else:
             pass
     return recheck
@@ -62,21 +68,22 @@ def process_folder(folder):
         mismatch_list = []
         for f in flist:
             try:
-                magic_string = magic.from_file(f)
-                if 'MPEG' in magic_string:
-                    tags = eyed3.load(f)
-                    if tags.tag.artist != os.path.basename(folder):
+                if is_audio_file(f):
+                    tags = mutagen.easyid3.EasyID3(f)
+                    artist =tags["artist"][0] 
+                    if artist != os.path.basename(folder):
                         found=False
                         for m in mismatch_list:
-                            if m.tag == tags.tag.artist:
+                            if m.tag == artist:
                                 m.add_file(f)
                                 found=True
                         if not found:
-                            mm = TagMismatch(tag=tags.tag.artist, expected=os.path.basename(folder))
+                            mm = TagMismatch(tag=artist, expected=os.path.basename(folder))
                             mm.add_file(f)
                             mismatch_list.append(mm)
 
-            except:
+            except Exception as e:
+                print(e)
                 error_state.append(f)
 
         if len(mismatch_list) > 0:
@@ -90,8 +97,6 @@ if len(sys.argv) == 0:
     exit(0)
 
 root=sys.argv[1]
-
-eyed3.log.setLevel("ERROR")
 
 
 artist_mismatch = []
