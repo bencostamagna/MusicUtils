@@ -45,7 +45,7 @@ def scan_files(folder, flist):
 
 def solve_mismatch(folder, mismatch_list):
     print(str(len(mismatch_list)) + " bad artist tags")
-    recheck = False
+    new_folder = folder
     for m in mismatch_list:
         print(str(len(m.files)) + " files containing tag "+m.tag+" but folder name is "+m.expected)
         print("1 Rename folder to " + m.tag)
@@ -53,9 +53,13 @@ def solve_mismatch(folder, mismatch_list):
         print("3 Ignore")
         var = input()
         if var == "1":
-            print ("Renaming "+folder + " to "+os.path.join(os.path.dirname(folder), m.tag))
-            os.rename(folder, os.path.join(os.path.dirname(folder), m.tag))
-            recheck = True
+            new_folder = os.path.join(os.path.dirname(folder), m.tag)
+            if not os.path.exists(new_folder):
+                print ("Renaming "+folder + " to "+new_folder)
+                os.rename(folder, new_folder)
+            else:
+                print("Folder "+new_folder+ " already exists, sorry")
+                new_folder=folder
         elif var == "2":
             print("Retagging")
             for f in m.files:
@@ -64,15 +68,15 @@ def solve_mismatch(folder, mismatch_list):
                 audiofile.save()
         else:
             pass
-    return recheck
+    return new_folder
 
 def process_folder(folder):
-    flist = []
-    scan_files(folder, flist)
     recheck = True
 
     while recheck:
         recheck = False
+        flist = []
+        scan_files(folder, flist)
         mismatch_list = []
         for f in flist:
             try:
@@ -97,7 +101,10 @@ def process_folder(folder):
                 error_state.append(f)
 
         if len(mismatch_list) > 0:
-            recheck = solve_mismatch(folder, mismatch_list)
+            new_folder = solve_mismatch(folder, mismatch_list)
+            if new_folder != folder:
+                recheck=True
+                folder=new_folder
 
 
 ############################################################################
