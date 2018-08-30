@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
 #
@@ -19,6 +19,11 @@ class TagMismatch:
 
     def add_file(self, filepath):
         self.files.append(filepath)
+
+
+def usage():
+    print('usage: ' + sys.argv[0] + ' folder')
+
 
 def get_file_type(f):
     magic_string = magic.from_file(f)
@@ -98,7 +103,8 @@ def process_folder(folder):
 ############################################################################
 
 
-if len(sys.argv) == 0:
+if len(sys.argv) != 2:
+    usage()
     exit(0)
 
 root=sys.argv[1]
