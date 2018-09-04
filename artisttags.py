@@ -63,8 +63,8 @@ def solve_mismatch(folder, mismatch_list):
         elif var == "2":
             print("Retagging")
             for f in m.files:
-                audiofile = mutagen.File(f)
-                audiofile["artist"] = m.expected
+                audiofile = mutagen.File(f,  easy=True)
+                audiofile['artist'] = m.expected
                 audiofile.save()
         else:
             pass
