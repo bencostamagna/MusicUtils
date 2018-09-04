@@ -20,6 +20,13 @@ class TagMismatch:
     def add_file(self, filepath):
         self.files.append(filepath)
 
+class bcolors:
+    ERROR = '\033[91m'#Red
+    FOLDER = '\033[94m' # Blue
+    TAG = '\033[92m' # Green
+    ENDC = '\033[0m'
+
+
 
 def usage():
     print('usage: ' + sys.argv[0] + ' folder')
@@ -47,18 +54,18 @@ def solve_mismatch(folder, mismatch_list):
     print(str(len(mismatch_list)) + " bad artist tags")
     new_folder = folder
     for m in mismatch_list:
-        print(str(len(m.files)) + " files containing tag "+m.tag+" but folder name is "+m.expected)
-        print("1 Rename folder to " + m.tag)
-        print("2 Change tags to " + m.expected)
+        print(str(len(m.files)) + " files containing tag "+bcolors.TAG+m.tag+bcolors.ENDC+" but folder name is "+bcolors.FOLDER+m.expected+bcolors.ENDC)
+        print("1 Rename folder to " + bcolors.TAG + m.tag + bcolors.ENDC)
+        print("2 Change tags to " + bcolors.FOLDER+m.expected+bcolors.ENDC)
         print("3 Ignore")
         var = input()
         if var == "1":
             new_folder = os.path.join(os.path.dirname(folder), m.tag)
             if not os.path.exists(new_folder):
-                print ("Renaming "+folder + " to "+new_folder)
+                print ("Renaming "+bcolors.FOLDER+folder+bcolors.ENDC + " to "+bcolors.TAG+new_folder+bcolors.ENDC)
                 os.rename(folder, new_folder)
             else:
-                print("Folder "+new_folder+ " already exists, sorry")
+                print(bcolors.ERROR+"Folder "+new_folder+ " already exists, sorry"+bcolors.ENDC)
                 new_folder=folder
         elif var == "2":
             print("Retagging")
