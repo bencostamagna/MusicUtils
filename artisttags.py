@@ -107,8 +107,7 @@ def process_folder(folder):
                             mismatch_list.append(mm)
 
             except Exception as e:
-                # print(e)
-                print(traceback.format_exc())
+                # print(traceback.format_exc())
                 error_state.append(f)
 
         if len(mismatch_list) > 0:
@@ -132,7 +131,7 @@ artist_mismatch = []
 error_state = []
 
 count=0
-for filename in os.listdir(root):
+for filename in sorted(os.listdir(root)):
     print (filename)
     if not os.path.isfile(os.path.join(root, filename)):
         process_folder(os.path.join(root, filename))
@@ -140,6 +139,10 @@ for filename in os.listdir(root):
 
 
 
-print(str(len(error_state)) + " errors in files")
+if len(error_state) > 0:
+    print(bcolors.ERROR+str(len(error_state)) + " errors in files"+bcolors.ENDC)
+    for f in error_state:
+        print(f)
+
 
 
