@@ -58,6 +58,8 @@ def solve_mismatch(folder, mismatch_list):
         print("1 Rename folder to " + bcolors.TAG + m.tag + bcolors.ENDC)
         print("2 Change tags to " + bcolors.FOLDER+m.expected+bcolors.ENDC)
         print("3 Ignore")
+        print("4 Ignore All")
+
         var = input()
         if var == "1":
             new_folder = os.path.join(os.path.dirname(folder), m.tag)
@@ -68,11 +70,13 @@ def solve_mismatch(folder, mismatch_list):
                 print(bcolors.ERROR+"Folder "+new_folder+ " already exists, sorry"+bcolors.ENDC)
                 new_folder=folder
         elif var == "2":
-            print("Retagging")
+            print("Applying tag "+bcolors.TAG+m.expected+bcolors.ENDC + "to "+ str(len(m.files)) + " files")
             for f in m.files:
                 audiofile = mutagen.File(f,  easy=True)
                 audiofile['artist'] = m.expected
                 audiofile.save()
+        elif var == "4":
+            break
         else:
             pass
     return new_folder
