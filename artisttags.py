@@ -126,8 +126,6 @@ if len(sys.argv) != 2:
 
 root=sys.argv[1]
 
-
-artist_mismatch = []
 error_state = []
 
 count=0
