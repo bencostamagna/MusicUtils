@@ -44,11 +44,12 @@ def scan_files(folder, flist, albums):
 def edit_genre(flist, genre):
     for f in flist:
         try:
-            print(f)
+            # print(f)
             tags = mutagen.File(f, easy=True)
-            tags['genre'] = genre
+            tags['genre'] = (genre)
             tags.save()
         except Exception as e:
+            print("Processing "+bcolors.ERROR+f+bcolors.ENDC)
             print(traceback.format_exc())
             error_state.append(f)
 
@@ -69,7 +70,7 @@ def process_folder(folder):
                     local_genres.append(genre)
 
         except Exception as e:
-            print(traceback.format_exc())
+            # print(traceback.format_exc())
             error_state.append(f)
 
     print("Albums:")
