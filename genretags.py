@@ -41,6 +41,17 @@ def scan_files(folder, flist, albums):
             albums.append(f)
             scan_files(os.path.join(folder, f), flist, albums)
 
+def edit_genre(flist, genre):
+    for f in flist:
+        try:
+            print(f)
+            tags = mutagen.File(f, easy=True)
+            tags['genre'] = genre
+            tags.save()
+        except Exception as e:
+            print(traceback.format_exc())
+            error_state.append(f)
+
 
 def process_folder(folder):
     print("Artist "+bcolors.ARTIST+os.path.basename(folder)+bcolors.ENDC);
@@ -53,12 +64,12 @@ def process_folder(folder):
             ftype = get_file_type(f)
             if ftype is not None:
                 tags = mutagen.File(f, easy=True)
-                genre = tags["genre"][0] 
+                genre = tags['genre'][0]
                 if genre not in local_genres:
                     local_genres.append(genre)
 
         except Exception as e:
-            # print(traceback.format_exc())
+            print(traceback.format_exc())
             error_state.append(f)
 
     print("Albums:")
@@ -69,6 +80,9 @@ def process_folder(folder):
         print(bcolors.GENRE+g+bcolors.ENDC)
     print("ENTER - Skip folder")
     var = input()
+
+    if len(var) > 0:
+        edit_genre(flist, var)
 
 ############################################################################
 
