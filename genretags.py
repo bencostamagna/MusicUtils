@@ -33,13 +33,26 @@ def get_file_type(f):
 
 
 
-def scan_files(folder, flist, albums):
+def scan_files(folder, flist, albums, genres):
     for f in os.listdir(folder):
-        if os.path.isfile(os.path.join(folder, f)):
-            flist.append(os.path.join(folder, f))
+        fpath = os.path.join(folder, f)
+        if os.path.isfile(fpath):
+            try:
+                ftype = get_file_type(fpath)
+                if ftype is not None:
+                    tags = mutagen.File(fpath, easy=True)
+                    g = tags['genre'][0]
+                    if g not in genres:
+                        genres.append(g)
+                flist.append(fpath)
+            except Exception as e:
+                # print(traceback.format_exc())
+                error_state.append(fpath)
+
+
         else:
             albums.append(f)
-            scan_files(os.path.join(folder, f), flist, albums)
+            scan_files(os.path.join(folder, f), flist, albums, genres)
 
 def edit_genre(flist, genre):
     for f in flist:
@@ -59,20 +72,8 @@ def process_folder(folder):
     flist = []
     albums = []
     local_genres = []
-    scan_files(folder, flist, albums)
-    for f in flist:
-        try:
-            ftype = get_file_type(f)
-            if ftype is not None:
-                tags = mutagen.File(f, easy=True)
-                genre = tags['genre'][0]
-                if genre not in local_genres:
-                    local_genres.append(genre)
-
-        except Exception as e:
-            # print(traceback.format_exc())
-            error_state.append(f)
-
+    genre_memory = []
+    scan_files(folder, flist, albums, local_genres)
     print("Albums:")
     for a in albums:
         print(bcolors.ALBUM+a+bcolors.ENDC)
@@ -80,9 +81,15 @@ def process_folder(folder):
     for g in local_genres:
         print(bcolors.GENRE+g+bcolors.ENDC)
     print("ENTER - Skip folder")
+    count = 0
+    for m in genre_memory:
+        count+=1
+        print(str(count)+" - "+bcolors.GENRE+m+bcolors.ENDC)
     var = input()
 
     if len(var) > 0:
+        if var not in genre_memory:
+            genre_memory.append(var)
         edit_genre(flist, var)
 
 ############################################################################
