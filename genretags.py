@@ -44,7 +44,7 @@ def scan_files(folder, flist, albums, genres):
                     g = tags['genre'][0]
                     if g not in genres:
                         genres.append(g)
-                flist.append(fpath)
+                    flist.append(fpath)
             except Exception as e:
                 # print(traceback.format_exc())
                 error_state.append(fpath)
@@ -67,12 +67,11 @@ def edit_genre(flist, genre):
             error_state.append(f)
 
 
-def process_folder(folder):
+def process_folder(folder, genre_memory):
     print("Artist "+bcolors.ARTIST+os.path.basename(folder)+bcolors.ENDC);
     flist = []
     albums = []
     local_genres = []
-    genre_memory = []
     scan_files(folder, flist, albums, local_genres)
     print("Albums:")
     for a in albums:
@@ -103,11 +102,12 @@ root=sys.argv[1]
 
 
 error_state = []
+genre_memory = []
 
 count=0
 for filename in sorted(os.listdir(root)):
     if not os.path.isfile(os.path.join(root, filename)):
-        process_folder(os.path.join(root, filename))
+        process_folder(os.path.join(root, filename), genre_memory)
     count+=1
 
 
