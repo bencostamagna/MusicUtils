@@ -19,6 +19,24 @@ class bcolors:
     ENDC = '\033[0m'
 
 
+class GenreCache:
+    _genreList = []
+
+    def addGenre(self, g):
+        if g not in self._genreList:
+            self._genreList.append(g)
+
+    def display(self):
+        count=0
+        for g in self._genreList:
+            print(str(count)+" - "+g)
+            count+=1
+
+    def getGenre(self, value):
+        if value.isnumeric() and int(value) < len(self._genreList):
+            return self._genreList[int(value)]
+        else:
+            return value
 def usage():
     print('usage: ' + sys.argv[0] + ' folder')
 
@@ -80,17 +98,13 @@ def process_folder(folder, genre_memory):
     for g in local_genres:
         print(bcolors.GENRE+g+bcolors.ENDC)
     print("ENTER - Skip folder")
-    count = 0
-    for m in genre_memory:
-        count+=1
-        print(str(count)+" - "+bcolors.GENRE+m+bcolors.ENDC)
+    genre_memory.display()
+
     var = input()
-
     if len(var) > 0:
-        if var not in genre_memory:
-            genre_memory.append(var)
-        edit_genre(flist, var)
-
+        g = genre_memory.getGenre(var)
+        edit_genre(flist, g)
+        genre_memory.addGenre(g)
 ############################################################################
 
 
@@ -102,7 +116,7 @@ root=sys.argv[1]
 
 
 error_state = []
-genre_memory = []
+genre_memory = GenreCache()
 
 count=0
 for filename in sorted(os.listdir(root)):
