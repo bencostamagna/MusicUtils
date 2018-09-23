@@ -105,6 +105,9 @@ def process_folder(folder, genre_memory):
         g = genre_memory.getGenre(var)
         edit_genre(flist, g)
         genre_memory.addGenre(g)
+    else:
+        for g in local_genres:
+            genre_memory.addGenre(g)
 ############################################################################
 
 
