@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
 #
-# Copyright © 2018 chupacabra <chupacabra@diziet>
-#
 # Distributed under terms of the GPL3 license.
 
 import sys, os, os.path
